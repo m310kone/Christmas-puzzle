@@ -6,174 +6,155 @@
 <title>クリスマスの謎解き</title>
 
 <style>
-  body {
-    margin: 0;
-    height: 100vh;
-    background: radial-gradient(circle at top, #1b4f9c, #0b2b55);
-    font-family: system-ui, sans-serif;
-    color: white;
-    overflow: hidden;
-  }
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
-  /* ===== 雪 ===== */
-  .snowflake {
-    position: fixed;
-    top: -10px;
-    font-size: 14px;
-    opacity: 0.8;
-    animation: fall linear infinite;
-    pointer-events: none;
-  }
-  @keyframes fall {
-    to { transform: translateY(110vh) translateX(40px); }
-  }
+body {
+  margin: 0;
+  height: 100vh;
+  background: radial-gradient(circle at top, #1b4f9c, #0b2b55);
+  overflow: hidden;
+}
 
-  /* ===== レイアウト ===== */
-  .container {
-    position: relative;
-    z-index: 5;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .card {
-    width: 90%;
-    max-width: 360px;
-    padding: 28px;
-    background: rgba(0,0,0,0.35);
-    border-radius: 22px;
-    box-shadow: 0 0 30px rgba(255,255,255,0.25);
-    text-align: center;
-    transition: transform 0.4s, box-shadow 0.4s;
-  }
-
-  h1 { margin-bottom: 10px; }
-
-  input {
-    width: 100%;
-    height: 56px;
-
-    box-sizing: border-box;
-    padding: 12px 16px;
-
-    font-size: 2.2em;
-    text-align: center;
-
-    border-radius: 14px;
-    border: none;
-    outline: none;
-
-    margin: 20px 0 15px;
-  }
-
-  button {
-  width: 100%;
-  height: 56px;
-  margin-top: 10px;
-
-  font-size: 1.2em;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-
-  border-radius: 16px;
-  border: none;
-
+/* ===== 雪 ===== */
+.snowflake {
+  position: fixed;
+  top: -10px;
+  font-size: 14px;
+  opacity: 0.8;
   color: white;
-  background: linear-gradient(
-    180deg,
-    #ff5f6d 0%,
-    #e63946 60%,
-    #c72c3b 100%
-  );
+  animation: fall linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) translateX(40px); }
+}
 
-  box-shadow:
-    0 6px 0 #9f1d2a,
-    0 10px 20px rgba(0,0,0,0.3);
+/* ===== レイアウト ===== */
+.container {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 360px;
+  background: rgba(255,255,255,0.90);
+  border-radius: 22px;
+  padding: 28px 24px 32px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+  margin: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
-  transition:
-    transform 0.1s ease,
-    box-shadow 0.1s ease,
-    filter 0.1s ease;
-  }
+h1 {
+  color: #1b4f9c;
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+}
 
-  button:active {
-    transform: translateY(4px);
-    box-shadow:
-      0 2px 0 #9f1d2a,
-      0 6px 10px rgba(0,0,0,0.3);
-    filter: brightness(0.95);
-  }
+p {
+  color: #333;
+  margin-bottom: 18px;
+}
 
-  button:disabled {
-    opacity: 0.6;
-    box-shadow: none;
-  }
+/* ===== 入力 ===== */
+input {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.6rem;
+  text-align: center;
+  border-radius: 12px;
+  border: 2px solid #ddd;
+  outline: none;
+}
 
-  /* ===== 不正解 ===== */
-  .shake {
-    animation: shake 0.4s;
-    box-shadow: 0 0 25px rgba(255,80,80,0.8);
-  }
+/* ===== ボタン（統一） ===== */
+button {
+  margin-top: 18px;
+  width: 100%;
+  padding: 14px;
+  font-size: 1.05rem;
+  font-weight: bold;
+  border-radius: 14px;
+  border: none;
+  color: #4a3b12;
+  background: linear-gradient(135deg, #f7e7b8, #d4af37);
+  box-shadow: 0 6px 0 #b5962e;
+  cursor: pointer;
+}
 
-  @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-6px); }
-    50% { transform: translateX(6px); }
-    75% { transform: translateX(-4px); }
-    100% { transform: translateX(0); }
-  }
+button:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #b5962e;
+}
 
-  .error-text {
-    color: #ffb3b3;
-    margin-top: 10px;
-    display: none;
-  }
+button:disabled {
+  opacity: 0.6;
+}
 
-  /* ===== 正解 ===== */
-  .flash {
-    position: fixed;
-    inset: 0;
-    background: white;
-    opacity: 0;
-    animation: flash 1.2s ease-out;
-    z-index: 15;
-    pointer-events: none;
-  }
-  @keyframes flash {
-    0% { opacity: 0; }
-    20% { opacity: 0.85; }
-    100% { opacity: 0; }
-  }
+/* ===== 不正解 ===== */
+.shake {
+  animation: shake 0.4s;
+  box-shadow: 0 0 25px rgba(255,80,80,0.8);
+}
 
-  .confetti {
-    position: fixed;
-    top: -10px;
-    width: 10px;
-    height: 10px;
-    animation: confettiFall 3s linear forwards;
-    z-index: 20;
-  }
-  @keyframes confettiFall {
-    to { transform: translateY(110vh) rotate(360deg); }
-  }
+@keyframes shake {
+  0% { transform: translateY(-50%) translateX(0); }
+  25% { transform: translateY(-50%) translateX(-6px); }
+  50% { transform: translateY(-50%) translateX(6px); }
+  75% { transform: translateY(-50%) translateX(-4px); }
+  100% { transform: translateY(-50%) translateX(0); }
+}
+
+#error {
+  color: #c0392b;
+  margin-top: 12px;
+  display: none;
+}
+
+/* ===== 正解演出 ===== */
+.flash {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  animation: flash 1.2s ease-out;
+  z-index: 8;
+}
+@keyframes flash {
+  0% { opacity: 0; }
+  20% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  animation: confettiFall 3s linear forwards;
+  z-index: 9;
+}
+@keyframes confettiFall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="card" id="card">
-    <div id="content">
-      <h1>🎄 サンタの挑戦状 🎄</h1>
-      <p>4桁の暗証番号を入力してね</p>
+<div class="container" id="card">
+  <div id="content">
+    <h1>🎄 サンタの挑戦状 🎄</h1>
+    <p>4桁の暗証番号を入力してね</p>
 
-      <input type="number" id="code" inputmode="numeric" placeholder="0000">
-      <button onclick="check()">決定</button>
+    <input type="number" id="code" inputmode="numeric" placeholder="0000">
+    <button onclick="check()">決 定</button>
 
-      <div class="error-text" id="error">❌ 違うみたい…</div>
-    </div>
+    <div id="error">❌ ちがうみたい…</div>
   </div>
 </div>
 
@@ -182,79 +163,74 @@
 </audio>
 
 <script>
-  const correctCode = "1220";
-  let solved = false;
+const correctCode = "1220";
+let solved = false;
 
-  /* 雪 */
-  setInterval(() => {
-    const snow = document.createElement("div");
-    snow.className = "snowflake";
-    snow.textContent = "❄";
-    snow.style.left = Math.random() * 100 + "vw";
-    snow.style.fontSize = 10 + Math.random() * 14 + "px";
-    snow.style.animationDuration = 8 + Math.random() * 6 + "s";
-    document.body.appendChild(snow);
-    setTimeout(() => snow.remove(), 15000);
-  }, 300);
+/* 雪 */
+setInterval(() => {
+  const snow = document.createElement("div");
+  snow.className = "snowflake";
+  snow.textContent = "❄";
+  snow.style.left = Math.random() * 100 + "vw";
+  snow.style.fontSize = 10 + Math.random() * 14 + "px";
+  snow.style.animationDuration = 8 + Math.random() * 6 + "s";
+  document.body.appendChild(snow);
+  setTimeout(() => snow.remove(), 15000);
+}, 300);
 
-  function check() {
-    if (solved) return;
+function check() {
+  if (solved) return;
 
-    const card = document.getElementById("card");
-    const error = document.getElementById("error");
+  const card = document.getElementById("card");
+  const error = document.getElementById("error");
 
-    if (code.value === correctCode) {
-      solved = true;
-      success();
-    } else {
-      error.style.display = "block";
-      card.classList.add("shake");
-      navigator.vibrate?.(100);
-
-      setTimeout(() => card.classList.remove("shake"), 400);
-    }
+  if (code.value === correctCode) {
+    solved = true;
+    success();
+  } else {
+    error.style.display = "block";
+    card.classList.add("shake");
+    navigator.vibrate?.(100);
+    setTimeout(() => card.classList.remove("shake"), 400);
   }
+}
 
-  function success() {
-    flash();
-    confetti();
-    document.getElementById("sound").play().catch(()=>{});
-    navigator.vibrate?.([200,100,200]);
+function success() {
+  flash();
+  confetti();
+  document.getElementById("sound").play().catch(()=>{});
 
-    setTimeout(() => {
-      document.getElementById("content").innerHTML = `
-        <h1>🎅 Ho Ho Ho!</h1>
-        <p>
-          よく わかったね！<br>
-          きみの ひらめき は 本物だ 🎁
-        </p>
-        <p>
-          プレゼント を 開ける カギ は…<br>
-          <strong>あかい靴下 の なか</strong>
-        </p>
-      `;
-    }, 500);
+  setTimeout(() => {
+    document.getElementById("content").innerHTML = `
+      <h1>🎅 Ho Ho Ho!</h1>
+      <p>
+        正解 おめでとう！<br><br>
+        プレゼント を あける カギは…<br>
+        <strong>あかい 靴下 の なか</strong>
+      </p>
+    `;
+  }, 500);
+}
+
+function flash() {
+  const f = document.createElement("div");
+  f.className = "flash";
+  document.body.appendChild(f);
+  setTimeout(() => f.remove(), 1200);
+}
+
+function confetti() {
+  const colors = ["#fff", "#ff4d4d", "#4dff4d", "#ffd700"];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.animationDuration = 2 + Math.random() * 2 + "s";
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 4000);
   }
-
-  function flash() {
-    const f = document.createElement("div");
-    f.className = "flash";
-    document.body.appendChild(f);
-    setTimeout(() => f.remove(), 1200);
-  }
-
-  function confetti() {
-    const colors = ["#fff", "#ff4d4d", "#4dff4d", "#ffd700"];
-    for (let i = 0; i < 80; i++) {
-      const c = document.createElement("div");
-      c.className = "confetti";
-      c.style.left = Math.random() * 100 + "vw";
-      c.style.background = colors[Math.floor(Math.random() * colors.length)];
-      c.style.animationDuration = 2 + Math.random() * 2 + "s";
-      document.body.appendChild(c);
-      setTimeout(() => c.remove(), 4000);
-    }
-  }
+}
 </script>
 
 </body>
