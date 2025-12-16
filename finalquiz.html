@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>サンタからの合言葉</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at top, #1e4d3a, #0b2e22);
+    overflow: hidden;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  #bg { z-index: 0; }
+  #finalBg { z-index: 9; opacity: 0; transition: opacity 1.5s ease; }
+  #finalBg.show { opacity: 1; }
+
+  /* ===== 入力画面 ===== */
+  .container {
+    position: relative;
+    z-index: 2;
+    width: 90%;
+    max-width: 360px;
+    background: rgba(255, 255, 255, 0.90);
+    border-radius: 20px;
+    padding: 28px 24px 32px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    margin: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  h1 { color: #1e4d3a; font-size: 1.3rem; }
+
+  input {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    border: 2px solid #ddd;
+    text-align: center;
+  }
+
+    button {
+    margin-top: 26px; /* ← 18px → 26px に */
+    width: 100%;
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    border-radius: 14px;
+    border: none;
+    color: #4a3b12;
+    background: linear-gradient(135deg, #f7e7b8, #d4af37);
+    box-shadow: 0 6px 0 #b5962e;
+    cursor: pointer;
+    }
+
+  button:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #b5962e;
+  }
+
+  #message { margin-top: 14px; min-height: 1.6em; }
+
+  /* ===== ワイプ ===== */
+  .wipe {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, #fffef5, #f3e8c8);
+    opacity: 0;
+    animation: wipe 1s forwards;
+    z-index: 8;
+  }
+
+  @keyframes wipe {
+    0% { opacity: 0; }
+    40% { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  /* ===== ご褒美画面 ===== */
+  .final {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.2s ease;
+  }
+
+  .final.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .final-card {
+    text-align: center;
+    padding: 40px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 26px;
+    box-shadow:
+      0 0 40px rgba(255,255,255,0.9),
+      0 0 80px rgba(255,215,150,0.8);
+    animation: floatIn 1.6s ease forwards, aura 3s ease-in-out infinite;
+  }
+
+  @keyframes floatIn {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  @keyframes aura {
+    0%,100% {
+      box-shadow:
+        0 0 40px rgba(255,255,255,0.9),
+        0 0 80px rgba(255,215,150,0.8);
+    }
+    50% {
+      box-shadow:
+        0 0 60px rgba(255,255,255,1),
+        0 0 120px rgba(255,220,170,1);
+    }
+  }
+
+  /* ===== 不正解アニメーション ===== */
+    .container.shake {
+    animation: shake 0.45s;
+    box-shadow: 0 0 25px rgba(255, 80, 80, 0.7);
+    }
+
+    @keyframes shake {
+    0%   { transform: translateY(-50%) translateX(0); }
+    20%  { transform: translateY(-50%) translateX(-6px); }
+    40%  { transform: translateY(-50%) translateX(6px); }
+    60%  { transform: translateY(-50%) translateX(-4px); }
+    80%  { transform: translateY(-50%) translateX(4px); }
+    100% { transform: translateY(-50%) translateX(0); }
+    }
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+<canvas id="finalBg"></canvas>
+
+<div class="container">
+  <h1>プレゼントはなに？</h1>
+  <input id="answer" type="text" placeholder="ここに入力" />
+  <button id="checkBtn">決 定</button>
+  <div id="message"></div>
+</div>
+
+<div class="final" id="final">
+  <div class="final-card">
+    <h1>🎅 メリークリスマス 🎄</h1>
+    <p>
+      よく 正解に たどり ついたね！<br><br>
+      サンタ からの プレゼント は<br>
+      <strong>入浴剤</strong>だよ 🎁
+    </p>
+  </div>
+</div>
+
+<script>
+/* ===== 通常背景 ===== */
+const bg = document.getElementById("bg");
+const bctx = bg.getContext("2d");
+const finalBg = document.getElementById("finalBg");
+const fctx = finalBg.getContext("2d");
+
+function resize() {
+  bg.width = finalBg.width = innerWidth;
+  bg.height = finalBg.height = innerHeight;
+}
+resize();
+addEventListener("resize", resize);
+
+const lights = Array.from({ length: 180 }, () => ({
+  x: Math.random() * bg.width,
+  y: Math.random() * bg.height,
+  r: Math.random() * 3 + 1,
+  phase: Math.random() * Math.PI * 2,
+  speed: Math.random() * 0.04 + 0.02
+}));
+
+function drawBg() {
+  bctx.clearRect(0,0,bg.width,bg.height);
+  lights.forEach(l => {
+    l.phase += l.speed;
+    const g = (Math.sin(l.phase)+1)/2;
+    bctx.beginPath();
+    bctx.arc(l.x,l.y,l.r+g*3,0,Math.PI*2);
+    bctx.fillStyle = `rgba(255,215,150,${0.3+g*0.5})`;
+    bctx.fill();
+  });
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* ===== ご褒美ネオン背景 ===== */
+const finalLights = Array.from({ length: 160 }, () => ({
+  x: Math.random()*finalBg.width,
+  y: Math.random()*finalBg.height,
+  r: Math.random()*4+2,
+  phase: Math.random()*Math.PI*2,
+  speed: Math.random()*0.03+0.01,
+  color: ["255,215,150","255,255,255","255,210,210"][Math.floor(Math.random()*3)]
+}));
+
+function drawFinal() {
+  fctx.clearRect(0,0,finalBg.width,finalBg.height);
+  finalLights.forEach(l=>{
+    l.phase+=l.speed;
+    const g=(Math.sin(l.phase)+1)/2;
+    fctx.shadowBlur=20+g*30;
+    fctx.shadowColor=`rgba(${l.color},0.9)`;
+    fctx.beginPath();
+    fctx.arc(l.x,l.y,l.r+g*4,0,Math.PI*2);
+    fctx.fillStyle=`rgba(${l.color},${0.4+g*0.5})`;
+    fctx.fill();
+  });
+  requestAnimationFrame(drawFinal);
+}
+drawFinal();
+
+/* ===== 判定 ===== */
+const ANSWER="入浴剤";
+checkBtn.onclick=()=>{
+  if(answer.value.trim()===ANSWER){
+    const wipe=document.createElement("div");
+    wipe.className="wipe";
+    document.body.appendChild(wipe);
+    setTimeout(()=>document.querySelector(".container").style.display="none",500);
+    setTimeout(()=>{
+      finalBg.classList.add("show");
+      final.classList.add("show");
+    },1000);
+  }else{
+  message.textContent = "❌ ちがうみたい…";
+  const card = document.querySelector(".container");
+  card.classList.add("shake");
+  navigator.vibrate?.(100);
+
+  setTimeout(() => card.classList.remove("shake"), 450);
+}
+};
+</script>
+
+</body>
+</html>
