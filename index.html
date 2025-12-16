@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>暗証番号入力</title>
+</head>
+<body style="text-align:center; margin-top:100px;">
+
+<h1>4桁の暗証番号を入力</h1>
+<input type="password" id="code" maxlength="4">
+<button onclick="check()">OK</button>
+
+<p id="result" style="font-size:24px;"></p>
+
+<script>
+function check() {
+  const correct = "1234"; // ← 正解の番号
+  const input = document.getElementById("code").value;
+
+  if (input === correct) {
+    document.getElementById("result").textContent = "🎉 正解！！ 🎉";
+  } else {
+    document.getElementById("result").textContent = "❌ 違います";
+  }
+}
+</script>
+
+</body>
+</html>
